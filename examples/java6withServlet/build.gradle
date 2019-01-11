@@ -8,20 +8,29 @@ buildscript {
     }
 }
 
+apply plugin: 'distribution'
 apply plugin: 'de.gliderpilot.jnlp'
+apply plugin: 'de.gliderpilot.jnlp-war'
 apply plugin: 'war'
 apply plugin: 'jetty'
 
+//jar.enabled = false
+
+configurations {
+    jnlpClasspath
+}
+
 dependencies {
-    jnlp project(":examples:application")
-    runtime 'org.codehaus.mojo.webstart:webstart-jnlp-servlet:1.0-6.0.02_ea_b02.2'
+    jnlpClasspath project(":examples:application")
+//    runtime 'org.codehaus.mojo.webstart:webstart-jnlp-servlet:1.0-6.0.02_ea_b02.2'
+    runtime project(':jnlp-servlet')
 }
 
 jnlp {
     jnlpParams << [codebase: '$$codebase']
     j2seParams = [version: '6.0+', 'max-heap-size': '256m']
-    useVersions = true
-    usePack200 = true
+    useVersions = false
+    usePack200 = false
     mainClassName = 'org.example.Launcher'
     withXml {
         information {
@@ -35,12 +44,31 @@ jnlp {
     signJarParams = [keystore: '../keystore.ks', alias: 'myalias', storepass: 'mystorepass']
 }
 
-generateJnlp << {
-    jnlpFile.with {
-        text = readLines('UTF-8').findAll { !it.contains('jnlp.versionEnabled') && !it.contains('jnlp.packEnabled') }.join('\n')
+generateJnlp {
+    from = project.configurations.jnlpClasspath
+    doLast {
+        jnlpFile.with {
+            text = readLines('UTF-8').findAll { !it.contains('jnlp.versionEnabled') && !it.contains('jnlp.packEnabled') }.join('\n')
+        }
     }
 }
 
-war {
-    from createWebstartDir
+copyJars {
+    from = project.configurations.jnlpClasspath
 }
+
+signJars {
+    from = project.configurations.jnlpClasspath
+}
+
+war {
+    dependsOn(createWebstartDir)
+    from(project.tasks.createWebstartDir.outputs.files) { into '/' }
+}
+
+jnlpWar {
+    versions {
+        v1 project.tasks.webstartDistZip.outputs.files
+    }
+}
+

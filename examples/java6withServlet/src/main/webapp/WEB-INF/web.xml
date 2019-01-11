@@ -4,19 +4,44 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
 
+  <filter>
+    <filter-name>jnlp-file-filter</filter-name>
+    <filter-class>de.gliderpilot.jnlp.servlet.JnlpFileFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>jnlp-file-filter</filter-name>
+    <url-pattern>*.jnlp</url-pattern>
+  </filter-mapping>
+
   <servlet>
-    <servlet-name>JnlpDownloadServlet</servlet-name>
-    <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>
+    <servlet-name>JnlpFileServlet</servlet-name>
+    <servlet-class>de.gliderpilot.jnlp.servlet.JnlpFileServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>JnlpJarServlet</servlet-name>
+    <servlet-class>de.gliderpilot.jnlp.servlet.JnlpJarServlet</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>JnlpImageServlet</servlet-name>
+    <servlet-class>de.gliderpilot.jnlp.servlet.JnlpImageServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>JnlpDownloadServlet</servlet-name>
+    <servlet-name>JnlpFileServlet</servlet-name>
     <url-pattern>*.jnlp</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>JnlpDownloadServlet</servlet-name>
+    <servlet-name>JnlpJarServlet</servlet-name>
     <url-pattern>*.jar</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>JnlpImageServlet</servlet-name>
+    <url-pattern>*.gif</url-pattern>
   </servlet-mapping>
 
 </web-app>
